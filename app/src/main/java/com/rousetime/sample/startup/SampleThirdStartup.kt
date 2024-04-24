@@ -2,20 +2,20 @@ package com.rousetime.sample.startup
 
 import android.content.Context
 import android.util.Log
-import com.rousetime.android_startup.AndroidStartup
-import com.rousetime.android_startup.Startup
+import com.webuy.android_startup.AndroidJob
+import com.webuy.android_startup.IJob
 
 /**
  * Created by idisfkj on 2020/7/24.
  * Email: idisfkj@gmail.com.
  */
-class SampleThirdStartup : AndroidStartup<Long>() {
+class SampleThirdStartup : AndroidJob<Long>() {
 
-    override fun callCreateOnMainThread(): Boolean = false
+    override fun runOnMainThread(): Boolean = false
 
-    override fun waitOnMainThread(): Boolean = false
+    override fun blockMainThread(): Boolean = false
 
-    override fun create(context: Context): Long? {
+    override fun call(context: Context): Long? {
         Thread.sleep(3000)
         return 10L
     }
@@ -27,7 +27,7 @@ class SampleThirdStartup : AndroidStartup<Long>() {
         )
     }
 
-    override fun onDependenciesCompleted(startup: Startup<*>, result: Any?) {
-        Log.d("SampleThirdStartup", "onDependenciesCompleted: ${startup::class.java.simpleName}, $result")
+    override fun onDependenciesCompleted(job: IJob<*>, result: Any?) {
+        Log.d("SampleThirdStartup", "onDependenciesCompleted: ${IJob::class.java.simpleName}, $result")
     }
 }

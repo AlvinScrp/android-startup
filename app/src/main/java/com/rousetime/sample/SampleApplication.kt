@@ -1,22 +1,15 @@
 package com.rousetime.sample
 
+import android.app.Activity
 import android.app.Application
-import android.net.Uri
+import android.content.Context
+import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import com.rousetime.android_startup.StartupListener
-import com.rousetime.android_startup.StartupManager
-import com.rousetime.android_startup.manager.StartupCacheManager
-import com.rousetime.android_startup.model.CostTimesModel
-import com.rousetime.android_startup.model.LoggerLevel
-import com.rousetime.android_startup.model.StartupConfig
-import com.rousetime.sample.startup.SampleFirstStartup
-import com.rousetime.sample.startup.SampleFourthStartup
-import com.rousetime.sample.startup.SampleSecondStartup
-import com.rousetime.sample.startup.SampleThirdStartup
-import com.rousetime.sample.startup.multiple.SampleMultipleFirstStartup
-import com.rousetime.sample.startup.multiple.SampleMultipleSecondStartup
-import com.rousetime.sample.startup.multiple.SampleMultipleThirdStartup
+import androidx.lifecycle.ProcessLifecycleOwner
+import com.webuy.android_startup.model.TimeModel
 
 /**
  * Created by idisfkj on 2020/7/24.
@@ -24,59 +17,81 @@ import com.rousetime.sample.startup.multiple.SampleMultipleThirdStartup
  */
 class SampleApplication : Application() {
 
+
     companion object {
         const val TAG = "SampleApplication"
 
+        @JvmStatic
+        lateinit var context: Context
+
+        @JvmStatic
+        lateinit var app: SampleApplication
+
         // only in order to test on MainActivity.
-        val costTimesLiveData = MutableLiveData<List<CostTimesModel>>()
+        val costTimesLiveData = MutableLiveData<List<TimeModel>>()
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        context = base!!
+        app = this
     }
 
     override fun onCreate() {
         super.onCreate()
 
-//        val config = StartupConfig.Builder()
-//            .setLoggerLevel(LoggerLevel.DEBUG)
-//            .setAwaitTimeout(12000L)
-//            .setListener(object : StartupListener {
-//                override fun onCompleted(totalMainThreadCostTime: Long, costTimesModels: List<CostTimesModel>) {
-//                    // can to do cost time statistics.
-//                    costTimesLiveData.value = costTimesModels
-//                    Log.d("StartupTrack", "onCompleted: ${costTimesModels.size}")
-//                }
-//            })
-//            .build()
+//        registerProcessLifecycleObserver()
 //
-//        StartupManager.Builder()
-//            .setConfig(config)
-//            .addStartup(SampleFirstStartup())
-//            .addStartup(SampleSecondStartup())
-//            .addStartup(SampleThirdStartup())
-//            .addStartup(SampleFourthStartup())
-//            .addStartup(SampleMultipleFirstStartup())
-//            .addStartup(SampleMultipleSecondStartup())
-//            .addStartup(SampleMultipleThirdStartup())
-//            .build(this)
-//            .start()
-//            .await()
+//        registerActivityLifeCycleCallBack()
 
-        if (StartupCacheManager.instance.hadInitialized(SampleSecondStartup::class.java)) {
-            Log.d(
-                TAG,
-                "SampleSecondStartup had initialized, result => ${StartupCacheManager.instance.obtainInitializedResult<Boolean>(SampleSecondStartup::class.java)}"
-            )
-        }
-
-        if (StartupCacheManager.instance.hadInitialized(SampleFourthStartup::class.java)) {
-            Log.d(
-                TAG,
-                "SampleFourthStartup had initialized, result => ${StartupCacheManager.instance.obtainInitializedResult<Boolean>(SampleFourthStartup::class.java)}"
-            )
-        } else {
-            Log.e(TAG, "SampleFourthStartup not initialized.")
-        }
-
-        // call multiple process init.
-        val uri = Uri.parse("content://com.rousetime.sample.android_startup.multiple")
-        contentResolver.query(uri, null, null, null, null)?.apply { close() }
     }
+
+    fun registerProcessLifecycleObserver() {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                super.onCreate(owner)
+                Log.d("alvin", "ProcessLifecycleOwner onCreate thread:${Thread.currentThread()}")
+            }
+
+            override fun onStart(owner: LifecycleOwner) {
+                super.onStart(owner)
+                Log.d("alvin", "ProcessLifecycleOwner onStart thread:${Thread.currentThread()}")
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                super.onStop(owner)
+                Log.d("alvin", "ProcessLifecycleOwner onStop thread:${Thread.currentThread()}")
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                super.onDestroy(owner)
+                Log.d("alvin", "ProcessLifecycleOwner onDestroy thread:${Thread.currentThread()}")
+            }
+        })
+    }
+
+    fun registerActivityLifeCycleCallBack() {
+        app.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                Log.d("alvin", "onActivityCreated activity:${activity} thread:${Thread.currentThread()}")
+            }
+
+            override fun onActivityStarted(activity: Activity) {
+                Log.d("alvin", "onActivityCreated activity:${activity} thread:${Thread.currentThread()}")
+            }
+
+            override fun onActivityResumed(activity: Activity) {}
+
+            override fun onActivityPaused(activity: Activity) {}
+
+            override fun onActivityStopped(activity: Activity) {
+                Log.d("alvin", "onActivityStopped activity:${activity} thread:${Thread.currentThread()}")
+            }
+
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+            override fun onActivityDestroyed(activity: Activity) {}
+        })
+    }
+
 }

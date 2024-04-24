@@ -42,6 +42,7 @@ dependencies {
     implementation Dependencies.core_ktx
     implementation Dependencies.appcompat
     implementation Dependencies.constraint_layout
+    implementation 'androidx.lifecycle:lifecycle-process:2.4.0'
 
     testImplementation Dependencies.junit
     androidTestImplementation Dependencies.ext_junit

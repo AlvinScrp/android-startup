@@ -2,22 +2,22 @@ package com.rousetime.sample.startup
 
 import android.content.Context
 import android.util.Log
-import com.rousetime.android_startup.AndroidStartup
-import com.rousetime.android_startup.Startup
-import com.rousetime.android_startup.executor.ExecutorManager
+import com.webuy.android_startup.AndroidJob
+import com.webuy.android_startup.IJob
+import com.webuy.android_startup.executor.ExecutorManager
 import java.util.concurrent.Executor
 
 /**
  * Created by idisfkj on 2020/7/24.
  * Email: idisfkj@gmail.com.
  */
-class SampleSecondStartup : AndroidStartup<Boolean>() {
+class SampleSecondStartup : AndroidJob<Boolean>() {
 
-    override fun callCreateOnMainThread(): Boolean = false
+    override fun runOnMainThread(): Boolean = false
 
-    override fun waitOnMainThread(): Boolean = true
+    override fun blockMainThread(): Boolean = true
 
-    override fun create(context: Context): Boolean {
+    override fun call(context: Context): Boolean {
         Thread.sleep(5000)
         return true
     }
@@ -30,7 +30,7 @@ class SampleSecondStartup : AndroidStartup<Boolean>() {
         return listOf("com.rousetime.sample.startup.SampleFirstStartup")
     }
 
-    override fun onDependenciesCompleted(startup: Startup<*>, result: Any?) {
-        Log.d("SampleSecondStartup", "onDependenciesCompleted: ${startup::class.java.simpleName}, $result")
+    override fun onDependenciesCompleted(job: IJob<*>, result: Any?) {
+        Log.d("SampleSecondStartup", "onDependenciesCompleted: ${IJob::class.java.simpleName}, $result")
     }
 }

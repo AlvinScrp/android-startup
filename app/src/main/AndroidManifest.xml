@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.rousetime.sample.MainActivity">
+        <activity android:name="com.rousetime.sample.MainActivity"  android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,44 +18,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SampleMoreActivity" />
+        <activity android:name=".SampleMoreActivity"  android:exported="false"/>
 
-        <activity android:name=".SampleCommonActivity" />
-
-        <service
-            android:name=".MultipleProcessService"
-            android:process=":multiple.process.service" />
-
-        <provider
-            android:name="com.rousetime.android_startup.provider.StartupProvider"
-            android:authorities="${applicationId}.android_startup"
-            android:exported="false">
-
-            <meta-data
-                android:name="com.rousetime.sample.startup.SampleStartupProviderConfig"
-                android:value="android.startup.provider.config" />
-
-            <meta-data
-                android:name="com.rousetime.sample.startup.SampleFourthStartup"
-                android:value="android.startup" />
-
-        </provider>
-
-        <provider
-            android:name=".provider.MultipleProcessStartupProvider"
-            android:authorities="${applicationId}.android_startup.multiple"
-            android:exported="false"
-            android:process=":multiple.provider">
-
-            <meta-data
-                android:name="com.rousetime.sample.startup.SampleStartupProviderConfig"
-                android:value="android.startup.provider.config" />
-
-            <meta-data
-                android:name="com.rousetime.sample.startup.multiple.SampleMultipleSecondStartup"
-                android:value="android.startup" />
-
-        </provider>
+        <activity android:name=".SampleCommonActivity"  android:exported="false"/>
 
     </application>
 

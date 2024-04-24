@@ -1,18 +1,18 @@
 package com.rousetime.sample.startup
 
 import android.content.Context
-import com.rousetime.android_startup.AndroidStartup
+import com.webuy.android_startup.AndroidJob
 
 /**
  * Created by idisfkj on 2020/8/18.
  * Email : idisfkj@gmail.com.
  */
-class SampleSyncThreeStartup : AndroidStartup<String>() {
-    override fun callCreateOnMainThread(): Boolean = true
+class SampleSyncThreeStartup : AndroidJob<String>() {
+    override fun runOnMainThread(): Boolean = true
 
-    override fun create(context: Context): String? {
+    override fun call(context: Context): String? {
         return "sync three"
     }
 
-    override fun waitOnMainThread(): Boolean = false
+    override fun blockMainThread(): Boolean = false
 }

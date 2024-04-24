@@ -1,72 +1,42 @@
 package com.rousetime.sample
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import com.rousetime.android_startup.StartupManager
-import com.rousetime.android_startup.manager.StartupCacheManager
-import com.rousetime.sample.startup.SampleFirstStartup
-import com.rousetime.sample.startup.SampleSecondStartup
-import com.rousetime.sample.startup.SampleStartupProviderConfig
-import kotlinx.android.synthetic.main.activity_main.*
+import com.webuy.android_startup.utils.StartupListener
+import com.webuy.android_startup.AppStartup
+import com.webuy.android_startup.model.StartupConfig
+import com.webuy.android_startup.model.TimeModel
+import com.rousetime.sample.job.Job1
+import com.rousetime.sample.job.Job2
+import com.rousetime.sample.job.Job3
+import com.rousetime.sample.job.Job4
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), StartupListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        get.setOnClickListener {
-            if (StartupCacheManager.instance.hadInitialized(SampleSecondStartup::class.java)) {
-                content.text = getString(
-                    R.string.sample_second_startup_result_from_cache,
-                    StartupCacheManager.instance.obtainInitializedResult<Boolean>(SampleSecondStartup::class.java)
-                )
-            } else {
-                // show initialize tips
-                content.text = getString(R.string.sample_second_startup_not_initialized)
+        AppStartup.Builder()
+            .setConfig(StartupConfig(logEnable = true, listener = this@MainActivity))
+            .addAllStartup(listOf(Job1(), Job2(), Job3(), Job4()))
+            .build(this)
+            .start()
+            .await()
+        Log.d("alvin", "after start")
 
-                // because SampleSecondStartup need to block on main thread.
-                // in order to show initialize tips,to delay a frame times.
-                Handler().postDelayed({
-                    StartupManager.Builder()
-                        .setConfig(SampleStartupProviderConfig().getConfig())
-                        .addStartup(SampleFirstStartup())
-                        .addStartup(SampleSecondStartup())
-                        .build(this)
-                        .start()
-                        .await()
-                }, 16)
-            }
-        }
+        Handler().postDelayed({
+            SampleApplication.app.registerProcessLifecycleObserver()
+            SampleApplication.app.registerActivityLifeCycleCallBack()
+        }, 3000)
 
-        clear.setOnClickListener {
-            StartupCacheManager.instance.remove(SampleSecondStartup::class.java)
-            content.text = getString(R.string.clear_cache_success)
-        }
+        Log.d("alvin", " Job1().name:${ Job1().name()}")
 
-        more.setOnClickListener {
-            startActivity(Intent(this, SampleMoreActivity::class.java))
-        }
 
-        SampleApplication.costTimesLiveData.observe(this, Observer {
-            content.text = buildString {
-                append("Startup Completed: ")
-                append("\n")
-                append("\n")
-                it.forEach {
-                    append("\n")
-                    append("Startup Name: ${it.name}")
-                    append("\n")
-                    append("CallOnMainThread: ${it.callOnMainThread}")
-                    append("\n")
-                    append("WaitOnMainThread: ${it.waitOnMainThread}")
-                    append("\n")
-                    append("Cost times: ${it.endTime - it.startTime} ms")
-                    append("\n")
-                }
-            }
-        })
+    }
+
+    override fun onCompleted(costTime: Long, models: List<TimeModel>) {
+        Log.d("alvin", "onCompleted: costTime->${costTime}, size:${models.size}")
     }
 }
